@@ -1,0 +1,97 @@
+#!/bin/sh
+
+# Regional Language
+uci set luci.main.lang=zh_cn
+uci commit luci
+
+# Time Zone Settings
+uci set system.@system[0].timezone=CST-8
+uci set system.@system[0].zonename=Asia/Shanghai
+uci commit system
+
+#uci set fstab.@global[0].anon_mount=1
+#uci commit fstab
+
+# Network IP Settings
+uci set network.lan.ipaddr='192.168.10.250'
+uci set network.lan.netmask='255.255.253.0'
+#uci set network.lan.ifname='eth0 eth1 eth2'
+#uci set network.wan6.ifname='eth5'
+#uci set network.wan.ifname='eth5'
+#uci set network.wan.username='ADSL@163.gd'
+#uci set network.wan.password='passwd'
+#uci set network.wan.proto='pppoe'
+uci delete network.@route[-1].interface=wan
+uci commit network
+
+# DHCP Switch Settings
+uci set dhcp.lan.start='2'
+uci set dhcp.lan.limit='254'
+uci set dhcp.lan.ignore='1'
+uci commit dhcp
+
+# Luci Optimize
+#rm -f /usr/lib/lua/luci/view/admin_status/index/mwan.htm
+#rm -f /usr/lib/lua/luci/view/admin_status/index/upnp.htm
+#rm -f /usr/lib/lua/luci/view/admin_status/index/ddns.htm
+#rm -f /usr/lib/lua/luci/view/admin_status/index/minidlna.htm
+
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/aria2.lua
+#sed -i 's/services/nas/g' /usr/lib/lua/luci/view/aria2/overview_status.htm
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/hd_idle.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/samba.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/minidlna.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/transmission.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/mjpg-streamer.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/p910nd.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/usb_printer.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/xunlei.lua
+#sed -i 's/services/nas/g'  /usr/lib/lua/luci/view/minidlna_status.htm
+
+ln -sf /sbin/ip /usr/bin/ip
+
+# System Security Settings
+# Opkg feeds Settings
+sed -i 's#http://downloads.openwrt.org#https://mirrors.cloud.tencent.com/lede#g' /etc/opkg/distfeeds.conf
+# Passwd Settings, Default: admin
+sed -i 's/root::0:0:99999:7:::/root:$1$XxDu6KOc$GxuZ/R0J2syD0eoxCW.by0:0:0:99999:7:::/g' /etc/shadow
+
+#sed -i "s/# //g" /etc/opkg/distfeeds.conf
+#sed -i '/openwrt_luci/ { s/snapshots/releases\/21.02/g; }'  /etc/opkg/distfeeds.conf
+
+# banner 
+#rm -rf /etc/banner
+
+# Firewall's Rules Settings
+sed -i '/REDIRECT --to-ports 53/d' /etc/firewall.user
+echo 'iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo 'iptables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo '[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo '[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+
+# Wireless's Name Settings
+sed -i '/option disabled/d' /etc/config/wireless
+sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
+#sed -i '/option disabled/d' /etc/config/wireless
+#sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
+
+# System Version Settings
+#sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
+#echo "DISTRIB_REVISION='v21.02'" >> /etc/openwrt_release
+#sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
+#echo "DISTRIB_DESCRIPTION='OpenWrt '" >> /etc/openwrt_release
+
+# Dnsmasq Settings
+sed -i '/log-facility/d' /etc/dnsmasq.conf
+echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+
+# Oth Settings
+#sed -i 's/cbi.submit\"] = true/cbi.submit\"] = \"1\"/g' /usr/lib/lua/luci/dispatcher.lua
+
+echo 'hsts=0' > /root/.wgetrc
+
+# Del LUCI Cache
+rm -rf /tmp/luci-modulecache/
+rm -f /tmp/luci-indexcache
+
+exit 0
