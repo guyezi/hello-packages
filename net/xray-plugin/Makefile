@@ -23,7 +23,7 @@ PKG_MAINTAINER:=Tianling Shen <cnsztl@project-openwrt.eu.org>
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_XRAY_PLUGIN_PROVIDE_V2RAY_PLUGIN \
 	CONFIG_XRAY_PLUGIN_COMPRESS_GOPROXY \
-	#CONFIG_XRAY_PLUGIN_COMPRESS_UPX
+	CONFIG_XRAY_PLUGIN_COMPRESS_UPX
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
@@ -44,9 +44,9 @@ config XRAY_PLUGIN_COMPRESS_GOPROXY
 	bool "Compiling with GOPROXY proxy"
 	default n
 
-#config XRAY_PLUGIN_COMPRESS_UPX
-	#bool "Compress executable files with UPX"
-	#default y
+config XRAY_PLUGIN_COMPRESS_UPX
+	bool "Compress executable files with UPX"
+	default y
 endef
 
 ifneq ($(CONFIG_XRAY_PLUGIN_COMPRESS_GOPROXY),)
@@ -68,16 +68,16 @@ endef
 
 define Build/Compile
 	$(call GoPackage/Build/Compile)
-#ifneq ($(CONFIG_XRAY_PLUGIN_COMPRESS_UPX),)
-	#$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/xray-plugin
-#endif
+ifneq ($(CONFIG_XRAY_PLUGIN_COMPRESS_UPX),)
+	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/xray-plugin
+endif
 endef
 
 define Package/xray-plugin/install
 	$(call GoPackage/Package/Install/Bin,$(1))
-#ifneq ($(CONFIG_XRAY_PLUGIN_PROVIDE_V2RAY_PLUGIN),)
-	#$(LN) xray-plugin $(1)/usr/bin/v2ray-plugin
-#endif
+ifneq ($(CONFIG_XRAY_PLUGIN_PROVIDE_V2RAY_PLUGIN),)
+	$(LN) xray-plugin $(1)/usr/bin/v2ray-plugin
+endif
 endef
 
 $(eval $(call GoBinPackage,xray-plugin))
