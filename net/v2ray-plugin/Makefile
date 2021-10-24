@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2020 SharerMax
+# Copyright (C) 2018-2021 honwen <https://github.com/honwen>
 #
-# This is free software, licensed under the GNU General Public License v2.
+# This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
 #
 
@@ -9,63 +9,65 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=v2ray-plugin
 PKG_VERSION:=4.42.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=20210921
+PKG_MAINTAINER:=chenhw2 <https://github.com/chenhw2>
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/teddysun/v2ray-plugin/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=e7fabd609b37e87cdf40a191c154802660faec9b6357331ee71988a2757fff31
-
-PKG_LICENSE:=MIT
-PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=madeye <max.c.lv@gmail.com>
-
-PKG_BUILD_DEPENDS:=golang/host
-PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
-
-GO_PKG:=github.com/shadowsocks/v2ray-plugin
-GO_PKG_LDFLAGS:=-s -w
-GO_PKG_LDFLAGS_X:=main.VERSION=v$(PKG_VERSION)
-
-PKG_CONFIG_DEPENDS := CONFIG_$(PKG_NAME)_INCLUDE_GOPROXY
-
-include $(INCLUDE_DIR)/package.mk
-include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
-
-define Package/$(PKG_NAME)/config
-config $(PKG_NAME)_INCLUDE_GOPROXY
-	depends on PACKAGE_v2ray-plugin
-	bool "Compiling with GOPROXY proxy"
-	default y
-
-endef
-
-ifeq ($(CONFIG_$(PKG_NAME)_INCLUDE_GOPROXY),y)
-export GO111MODULE=on
-export GOPROXY=https://goproxy.cn
+# OpenWrt ARCH: arm, i386, x86_64, mips, mipsel
+# Golang ARCH: arm[5-7], 386, amd64, mips, mipsle
+PKG_ARCH:=$(ARCH)
+BIN_ARCH:=$(ARCH)
+ifeq ($(ARCH),mips)
+	BIN_ARCH:=mips_sf
+endif
+ifeq ($(ARCH),mipsel)
+	PKG_ARCH:=mips
+	BIN_ARCH:=mipsle_sf
+endif
+ifeq ($(ARCH),i386)
+	PKG_ARCH:=386
+	BIN_ARCH:=386
+endif
+ifeq ($(ARCH),x86_64)
+	PKG_ARCH:=amd64
+	BIN_ARCH:=amd64
+endif
+ifeq ($(ARCH),aarch64)
+	PKG_ARCH:=arm64
+	BIN_ARCH:=arm64
+endif
+ifeq ($(ARCH),arm)
+	BIN_ARCH:=arm7
 endif
 
-define Package/$(PKG_NAME)
+PKG_SOURCE:=v2ray-plugin-linux-$(PKG_ARCH)-v$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://github.com/teddysun/v2ray-plugin/releases/download/v$(PKG_VERSION)/
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
+PKG_HASH:=skip
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/v2ray-plugin
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=SIP003 plugin for shadowsocks, based on v2ray
-	URL:=https://github.com/teddysun/v2ray-plugin
-	DEPENDS:=$(GO_ARCH_DEPENDS) +ca-certificates
+	URL:=https://github.com/shadowsocks/v2ray-plugin
 endef
 
-define Package/$(PKG_NAME)/description
+define Package/v2ray-plugin/description
 	Yet another SIP003 plugin for shadowsocks, based on v2ray
 endef
 
+define Build/Prepare
+	gzip -dc "$(DL_DIR)/$(PKG_SOURCE)" | tar -C $(PKG_BUILD_DIR)/ -xf -
+endef
+
 define Build/Compile
-	$(call GoPackage/Build/Compile)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/v2ray-plugin || true
+	echo "$(PKG_NAME)Compile Skipped!"
 endef
 
-define Package/$(PKG_NAME)/install
+define Package/v2ray-plugin/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/v2ray-plugin $(1)/usr/bin/v2ray-plugin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/v2ray-plugin_linux_$(BIN_ARCH) $(1)/usr/bin/v2ray-plugin
 endef
 
-$(eval $(call GoBinPackage,$(PKG_NAME)))
-$(eval $(call BuildPackage,$(PKG_NAME)))
+$(eval $(call BuildPackage,v2ray-plugin))
