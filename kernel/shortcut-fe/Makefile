@@ -26,12 +26,19 @@ define KernelPackage/shortcut-fe
   DEPENDS:=@IPV6 @LINUX_5_4
   TITLE:=Kernel driver for SFE
   FILES:=$(PKG_BUILD_DIR)/shortcut-fe.ko $(PKG_BUILD_DIR)/shortcut-fe-ipv6.ko
-  KCONFIG:=CONFIG_NF_CONNTRACK_EVENTS=y CONFIG_SHORTCUT_FE=y 
-  AUTOLOAD:=$(call AutoProbe,shortcut-fe shortcut-fe-ipv6)
+  KCONFIG:=CONFIG_NF_CONNTRACK_EVENTS=y CONFIG_SHORTCUT_FE=y CONFIG_NF_CONNTRACK_TIMEOUT=y CONFIG_XFRM=y
+  AUTOLOAD:=$(call AutoProbe,09,shortcut-fe shortcut-fe-ipv6)
 endef
 
 define KernelPackage/shortcut-fe/Description
 Shortcut is an in-Linux-kernel IP packet forwarding engine.
+endef
+
+define KernelPackage/shortcut-fe/install
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/shortcut-fe $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/sfe_dump $(1)/usr/bin
 endef
 
 define KernelPackage/shortcut-fe-cm
@@ -41,9 +48,11 @@ define KernelPackage/shortcut-fe-cm
   DEPENDS:=+kmod-ipt-conntrack +kmod-shortcut-fe
   TITLE:=Kernel driver for SFE
   FILES:=$(PKG_BUILD_DIR)/shortcut-fe-cm.ko
-  KCONFIG:=CONFIG_NF_CONNTRACK_CHAIN_EVENTS=y CONFIG_NF_CONNTRACK_MARK=y
+  KCONFIG:=CONFIG_NF_CONNTRACK_CHAIN_EVENTS=y CONFIG_NF_CONNTRACK_MARK=y CONFIG_NF_CONNTRACK_EVENTS=y CONFIG_XFRM=y
+  CONFLICTS:=kmod-shortcut-fe-drv
   AUTOLOAD:=$(call AutoProbe,shortcut-fe-cm)
 endef
+
 
 define KernelPackage/shortcut-fe-cm/Description
 Simple connection manager for the Shortcut forwarding engine.
@@ -118,4 +127,3 @@ $(eval $(call KernelPackage,shortcut-fe))
 $(eval $(call KernelPackage,shortcut-fe-cm))
 $(eval $(call KernelPackage,fast-classifier))
 #$(eval $(call BuildPackage,fast-classifier-example))
-
