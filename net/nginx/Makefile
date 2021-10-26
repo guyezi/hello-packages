@@ -27,8 +27,11 @@ PKG_INSTALL:=1
 PKG_CONFIG_DEPENDS := \
 	CONFIG_NGINX_DAV \
 	CONFIG_NGINX_FLV \
+	CONFIG_NGINX_MP4 \
+	CONFIG_NGINX_XSLT \
 	CONFIG_NGINX_UBUS \
 	CONFIG_NGINX_STUB_STATUS \
+	CONFIG_NGINX_FANCYINDEX \
 	CONFIG_NGINX_HTTP_CHARSET \
 	CONFIG_NGINX_HTTP_GZIP \
 	CONFIG_NGINX_HTTP_SSI \
@@ -239,6 +242,12 @@ ifneq ($(BUILD_VARIANT),all-module)
   ifeq ($(CONFIG_NGINX_FLV),y)
     ADDITIONAL_MODULES += --with-http_flv_module
   endif
+  ifeq ($(CONFIG_NGINX_MP4),y)
+   ADDITIONAL_MODULES += --with-http_mp4_module
+  endif
+  ifeq ($(CONFIG_NGINX_XSLT),y)
+   ADDITIONAL_MODULES += --with-http_xslt_module
+  endif
   ifeq ($(CONFIG_NGINX_DAV),y)
     ADDITIONAL_MODULES += --with-http_dav_module --add-module=$(PKG_BUILD_DIR)/nginx-dav-ext-module
   endif
@@ -270,13 +279,16 @@ ifneq ($(BUILD_VARIANT),all-module)
     ADDITIONAL_MODULES += --with-stream_ssl_preread_module
   endif
   ifeq ($(CONFIG_NGINX_HEADERS_MORE),y)
-    ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/nginx-headers-more
+   ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/nginx-headers-more
   endif
   ifeq ($(CONFIG_NGINX_HTTP_BROTLI),y)
     ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/nginx-brotli
   endif
   ifeq ($(CONFIG_NGINX_RTMP_MODULE),y)
     ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/nginx-rtmp
+  endif
+  ifeq ($(CONFIG_NGINX_FANCYINDEX),y)
+    ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/ngx-fancyindex
   endif
   ifeq ($(CONFIG_NGINX_TS_MODULE),y)
     ADDITIONAL_MODULES += --add-module=$(PKG_BUILD_DIR)/nginx-ts
@@ -285,13 +297,15 @@ else
   CONFIG_NGINX_HEADERS_MORE:=y
   CONFIG_NGINX_HTTP_BROTLI:=y
   CONFIG_NGINX_RTMP_MODULE:=y
+  CONFIG_NGINX_FANCYINDEX:=y
   CONFIG_NGINX_TS_MODULE:=y
   CONFIG_NGINX_NAXSI:=y
+  CONFIG_NGINX_MP4:=y
   CONFIG_NGINX_LUA:=y
   CONFIG_NGINX_DAV:=y
   CONFIG_NGINX_UBUS:=y
   ADDITIONAL_MODULES += --with-ipv6 --with-http_stub_status_module --with-http_flv_module \
-	--with-http_dav_module \
+	--with-http_dav_module --with-http_mp4_module --with-http_xslt_module \
 	--with-http_auth_request_module --with-http_v2_module --with-http_realip_module \
 	--with-http_secure_link_module --with-http_sub_module \
 	--with-stream --with-stream_ssl_module --with-stream_ssl_preread_module \
@@ -300,6 +314,7 @@ else
 	--add-module=$(PKG_BUILD_DIR)/lua-nginx \
 	--add-module=$(PKG_BUILD_DIR)/nginx-dav-ext-module \
 	--add-module=$(PKG_BUILD_DIR)/nginx-brotli --add-module=$(PKG_BUILD_DIR)/nginx-rtmp \
+	--add-module=$(PKG_BUILD_DIR)/$(PKG_BUILD_DIR)/ngx-fancyindex \
 	--add-module=$(PKG_BUILD_DIR)/nginx-ts --add-module=$(PKG_BUILD_DIR)/nginx-ubus-module
   config_files += koi-utf koi-win win-utf fastcgi_params uwsgi_params
 endif
@@ -393,6 +408,7 @@ define Build/Prepare
 	$(Prepare/nginx-brotli)
 	$(Prepare/nginx-headers-more)
 	$(Prepare/nginx-rtmp)
+	$(Prepare/nginx-fancyindex)
 	$(Prepare/nginx-ts)
 	$(Prepare/nginx-dav-ext-module)
 	$(Prepare/nginx-ubus-module)
@@ -415,7 +431,6 @@ ifeq ($(CONFIG_NGINX_HEADERS_MORE),y)
 	xzcat $(DL_DIR)/$(FILE) | tar -C $(PKG_BUILD_DIR) $(TAR_OPTIONS)
   endef
 endif
-
 
 ifeq ($(CONFIG_NGINX_HTTP_BROTLI),y)
   define Download/nginx-brotli
@@ -452,6 +467,22 @@ ifeq ($(CONFIG_NGINX_RTMP_MODULE),y)
   endef
 endif
 
+ifeq ($(CONFIG_NGINX_FANCYINDEX_MODULE),y)
+  define Download/nginx-fancyindex
+    VERSION:=v0.5.1
+    SUBDIR:=nginx-fancyindex
+    FILE:=ngx-fancyindex-$$(VERSION).tar.xz
+    URL:=https://github.com/aperezdc/ngx-fancyindex.git
+    MIRROR_HASH:=skip
+    PROTO:=git
+  endef
+  $(eval $(call Download,nginx-fancyindex))
+
+  define  Prepare/nginx-fancyindex
+        $(eval $(Download/nginx-fancyindex))
+        xzcat $(DL_DIR)/$(FILE) | tar -C $(PKG_BUILD_DIR) $(TAR_OPTIONS)
+  endef
+endif
 
 ifeq ($(CONFIG_NGINX_TS_MODULE),y)
   define Download/nginx-ts

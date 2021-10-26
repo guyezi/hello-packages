@@ -29,6 +29,27 @@ config NGINX_FLV
 		Provides the ability to seek within FLV (Flash) files using time-based offsets.
 	default n
 
+config NGINX_FANCYINDEX
+	bool
+	prompt "Enable fancy index module"
+	default n
+	help
+		Like the built-in autoindex module, but fancier.
+
+config NGINX_MP4
+	bool
+	prompt "Enable MP4 module"
+	default n
+	help
+		Enables mp4 streaming with seeking ability.
+
+config NGINX_XSLT
+	bool
+	prompt "Enable XSLT module"
+	default n
+	help
+		Post-process pages with XSLT..
+
 config NGINX_STUB_STATUS
 	bool
 	prompt "Enable stub status module"
