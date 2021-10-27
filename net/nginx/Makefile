@@ -473,7 +473,7 @@ ifeq ($(CONFIG_NGINX_FANCYINDEX_MODULE),y)
     SUBDIR:=nginx-fancyindex
     FILE:=ngx-fancyindex-$$(VERSION).tar.xz
     URL:=https://github.com/aperezdc/ngx-fancyindex.git
-    MIRROR_HASH:=skip
+    MIRROR_HASH:=af9f5f6b771e7189dc3c0a679c6faad1
     PROTO:=git
   endef
   $(eval $(call Download,nginx-fancyindex))
