@@ -314,7 +314,7 @@ else
 	--add-module=$(PKG_BUILD_DIR)/lua-nginx \
 	--add-module=$(PKG_BUILD_DIR)/nginx-dav-ext-module \
 	--add-module=$(PKG_BUILD_DIR)/nginx-brotli --add-module=$(PKG_BUILD_DIR)/nginx-rtmp \
-	--add-module=$(PKG_BUILD_DIR)/$(PKG_BUILD_DIR)/ngx-fancyindex \
+	--add-module=$(PKG_BUILD_DIR)/ngx-fancyindex \
 	--add-module=$(PKG_BUILD_DIR)/nginx-ts --add-module=$(PKG_BUILD_DIR)/nginx-ubus-module
   config_files += koi-utf koi-win win-utf fastcgi_params uwsgi_params
 endif
