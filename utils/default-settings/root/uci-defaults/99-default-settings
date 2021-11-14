@@ -14,14 +14,14 @@ uci commit system
 
 # Network IP Settings
 uci set network.lan.ipaddr='192.168.10.250'
-uci set network.lan.netmask='255.255.253.0'
+uci set network.lan.netmask='255.255.255.0'
 #uci set network.lan.ifname='eth0 eth1 eth2'
 #uci set network.wan6.ifname='eth5'
 #uci set network.wan.ifname='eth5'
 #uci set network.wan.username='ADSL@163.gd'
 #uci set network.wan.password='passwd'
 #uci set network.wan.proto='pppoe'
-uci delete network.@route[-1].interface=wan
+#uci delete network.@route[-1].interface=wan
 uci commit network
 
 # DHCP Switch Settings
