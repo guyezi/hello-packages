@@ -20,7 +20,7 @@ define Package/defaultsettings
   SECTION:=luci
   CATEGORY:=LuCI
   TITLE:=Openwrt support for Default Settings
-  PKGARCH:=all
+  #PKGARCH:=all
   DEPENDS:=+luci-base +luci +luci-compat +@LUCI_LANG_zh-cn +nano
 endef
 
