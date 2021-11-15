@@ -33,7 +33,7 @@ PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE.txt
 PKG_MAINTAINER:=CN_SZTL <cnsztl@project-openwrt.eu.org>
 
-PKG_BUILD_DEPENDS:=golang/host node/host
+PKG_BUILD_DEPENDS:=golang/host node/host upx/host
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
 
