@@ -21,7 +21,7 @@ define Package/defaultsettings
   CATEGORY:=LuCI
   TITLE:=Openwrt support for Default Settings
   PKGARCH:=all
-  DEPENDS:=+luci-base +luci +luci-compat +@LUCI_LANG_zh-cn +nano
+  DEPENDS:=+luci-base +luci +luci-compat +@LUCI_LANG_zh-cn +nano +kmod-usb-core +kmod-usb-storage +kmod-fs-ext4 +block-mount +e2fsprogs +fdisk
 endef
 
 define Package/defaultsettings/description

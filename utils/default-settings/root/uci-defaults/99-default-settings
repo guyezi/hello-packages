@@ -27,7 +27,8 @@ uci commit network
 # DHCP Switch Settings
 uci set dhcp.lan.start='2'
 uci set dhcp.lan.limit='254'
-uci set dhcp.lan.ignore='1'
+# DHCP IP ON
+uci set dhcp.lan.ignore='0'
 uci commit dhcp
 
 # Luci Optimize
@@ -53,13 +54,13 @@ ln -sf /sbin/ip /usr/bin/ip
 # System Security Settings
 # Opkg feeds Settings
 sed -i 's#http://downloads.openwrt.org#https://mirrors.cloud.tencent.com/lede#g' /etc/opkg/distfeeds.conf
-# Passwd Settings, Default: admin
-sed -i 's/root::0:0:99999:7:::/root:$1$XxDu6KOc$GxuZ/R0J2syD0eoxCW.by0:0:0:99999:7:::/g' /etc/shadow
+# Passwd Settings, Default: guyezi
+sed -i 's/root::0:0:99999:7:::/root:$1$klVwpBu9$3fefxJdemE9wVC7udSCMA/:0:0:99999:7:::/g' /etc/shadow
 
 #sed -i "s/# //g" /etc/opkg/distfeeds.conf
 #sed -i '/openwrt_luci/ { s/snapshots/releases\/21.02/g; }'  /etc/opkg/distfeeds.conf
 
-# banner 
+# banner
 #rm -rf /etc/banner
 
 # Firewall's Rules Settings
@@ -72,8 +73,6 @@ echo '[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p tcp 
 # Wireless's Name Settings
 sed -i '/option disabled/d' /etc/config/wireless
 sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
-#sed -i '/option disabled/d' /etc/config/wireless
-#sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
 
 # System Version Settings
 #sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release

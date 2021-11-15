@@ -1,0 +1,8 @@
+--- a/shortcut-fe/Makefile
++++ b/shortcut-fe/Makefile
+@@ -21,24 +21,24 @@
+  shortcut-fe-cm-objs := \
+  	sfe_cm.o
+  
+-! ccflags-y += -Werror -Wall
++! ccflags-y += -Wall
