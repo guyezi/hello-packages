@@ -15,6 +15,7 @@ PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/Erope/BaiduPCS-Go.git
 PKG_SOURCE_VERSION:=5649b562ef4d5390fa18a996042f5f7d27b2ef8d
+PKG_MIRROR_HASH:=5cdff81544f52cbadc8eb0eb7a855a41ad8f751edd702e9da5f3a05041baf81d
 
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
@@ -23,7 +24,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_BAIDUPCS_WEB_COMPRESS_GOPROXY \
 	CONFIG_BAIDUPCS_WEB_COMPRESS_UPX
 
-PKG_BUILD_DEPENDS:=golang/host
+PKG_BUILD_DEPENDS:=golang/host upx/host
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
 
@@ -39,7 +40,7 @@ define Package/$(PKG_NAME)
 	CATEGORY:=Network
 	TITLE:=BaiduPCS-Web is a web controller for BaiduPCS-Go
 	URL:=https://github.com/Erope/BaiduPCS-Go
-	DEPENDS:=$(GO_ARCH_DEPENDS)
+	DEPENDS:=$(GO_ARCH_DEPENDS) +upx
 endef
 
 define Package/$(PKG_NAME)/description
@@ -58,14 +59,15 @@ endef
 
 ifeq ($(CONFIG_BAIDUPCS_WEB_COMPRESS_GOPROXY),y)
 	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
+	export GOPROXY=https://goproxy.cn
 endif
 
 define Build/Compile
 ( \
-  GOOS=$$$$(go env GOOS) GOARCH=$$$$(go env GOARCH) go get -v github.com/GeertJohan/go.rice/rice/... ; \
+  GOOS=$$$$(go env GOOS) GOARCH=$$$$(go env GOARCH) go get -v github.com/GeertJohan/go.rice ; \
+  GOOS=$$$$(go env GOOS) GOARCH=$$$$(go env GOARCH) go get -v github.com/GeertJohan/go.rice/rice ; \
   cd $(PKG_BUILD_DIR)/internal/pcsweb ; \
-  "$$$$(go env GOPATH)/bin/rice" embed-go ; \
+  "$$$$(go env GOPATH)/bin/rice" -i github.com/Erope/BaiduPCS-Go/internal/pcsweb embed-go ; \
 )
 	$(call GoPackage/Build/Compile)
 ifeq ($(CONFIG_BAIDUPCS_WEB_COMPRESS_UPX),y)
