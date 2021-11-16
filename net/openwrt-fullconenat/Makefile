@@ -20,7 +20,7 @@ PKG_MIRROR_HASH:=e7bb77d9916d190b3c02975faf62d1794557d4a4a774cd0cf1f3a6ddb7403e3
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=LICENSE
 
-include $(INCLUDE_DIR)/package.mk
+#include $(INCLUDE_DIR)/package.mk
 
 define Package/iptables-mod-fullconenat
   SUBMENU:=Firewall
